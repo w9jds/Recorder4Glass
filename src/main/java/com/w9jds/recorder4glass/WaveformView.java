@@ -16,7 +16,7 @@ public class WaveformView extends SurfaceView
 {
 
     // The number of buffer frames to keep around (for a nice fade-out visualization).
-    private static final int HISTORY_SIZE = 6;
+    private static final int HISTORY_SIZE = 1;
 
     // To make quieter sounds still show up well on the display, we use +/- 8192 as the amplitude
     // that reaches the top/bottom of the view instead of +/- 32767. Any samples that have

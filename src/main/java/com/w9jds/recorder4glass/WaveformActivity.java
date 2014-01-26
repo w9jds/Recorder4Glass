@@ -7,8 +7,6 @@ import android.media.MediaRecorder.AudioSource;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.Menu;
 import android.widget.TextView;
 
 import java.io.BufferedOutputStream;
@@ -55,25 +53,25 @@ public class WaveformActivity extends Activity
         mDecibelFormat = getResources().getString(R.string.decibel_format);
     }
 
-    @Override
-    public boolean onKeyDown(int keycode, KeyEvent event)
-    {
-        if (keycode == KeyEvent.KEYCODE_DPAD_CENTER)
-        {
-            openOptionsMenu();
-            return true;
-        }
+//    @Override
+//    public boolean onKeyDown(int keycode, KeyEvent event)
+//    {
+//        if (keycode == KeyEvent.KEYCODE_DPAD_CENTER)
+//        {
+//            openOptionsMenu();
+//            return true;
+//        }
+//
+//        return false;
+//    }
 
-        return false;
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu)
+//    {
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.main, menu);
+//        return true;
+//    }
 
     @Override
     public boolean onOptionsItemSelected(android.view.MenuItem iItem)
@@ -121,6 +119,8 @@ public class WaveformActivity extends Activity
     {
 
         private boolean mShouldContinue = true;
+        private int mnBufferRead;
+        private DataOutputStream mdosStream = null;
 
         @Override
         public void run()
@@ -135,7 +135,7 @@ public class WaveformActivity extends Activity
 
             OutputStream fosStream = null;
             BufferedOutputStream bosStream;
-            DataOutputStream dosStream = null;
+
 
             try
             {
@@ -143,7 +143,7 @@ public class WaveformActivity extends Activity
                 Log.d("Recorder4Glass", "Created File " + MUSIC_BUCKET_NAME + "/record.pcm");
                 bosStream = new BufferedOutputStream(fosStream);
                 Log.d("recorder4Glass", "Created bosStream");
-                dosStream = new DataOutputStream(bosStream);
+                mdosStream = new DataOutputStream(bosStream);
                 Log.d("recorder4Glass", "Created dosStream");
             }
             catch(FileNotFoundException e)
@@ -153,22 +153,11 @@ public class WaveformActivity extends Activity
 
             while (shouldContinue())
             {
-                int bufferReadResult = arRecorder.read(mAudioBuffer, 0, mBufferSize);
+                mnBufferRead = arRecorder.read(mAudioBuffer, 0, mBufferSize / 2);
                 Log.d("recorder4Glass", "Read buffer Result");
 
-                for (int i = 0; i < bufferReadResult; i++)
-                {
-                    try
-                    {
-                        dosStream.writeShort(mAudioBuffer[i]);
-                        Log.d("recorder4Glass", "Writing Buffer " + i);
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                        Log.d("recorder4Glass", e.getCause().toString());
-                    }
-                }
+                SaveRecordingThread srThread = new SaveRecordingThread();
+                srThread.start();
 
                 mWaveformView.updateAudioData(mAudioBuffer);
                 Log.d("recorder4Glass", "Updating Audio Wave");
@@ -208,6 +197,30 @@ public class WaveformActivity extends Activity
         public synchronized void stopRunning()
         {
             mShouldContinue = false;
+        }
+
+        private class SaveRecordingThread extends Thread
+        {
+
+            @Override
+            public void run()
+            {
+                int bufferReadResult = mnBufferRead;
+
+                for (int i = 0; i < bufferReadResult; i++)
+                {
+                    try
+                    {
+                        mdosStream.writeShort(mAudioBuffer[i]);
+                        Log.d("recorder4Glass", "Writing Buffer " + i);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.d("recorder4Glass", e.getCause().toString());
+                    }
+                }
+            }
         }
 
         /**
