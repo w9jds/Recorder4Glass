@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+    <string name="app_name">Recorder for Glass</string>
+    <string name="stop_menu">Stop</string>
+
+    <string name="glass_voice_trigger">Voice Note</string>
+    <string name="decibel_format">%1$.1f dB</string>
+
+</resources>

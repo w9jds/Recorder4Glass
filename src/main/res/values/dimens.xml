@@ -1,0 +1,6 @@
+<resources>
+
+    <dimen name="footer_right_margin">40px</dimen>
+    <dimen name="footer_bottom_margin">29px</dimen>
+
+</resources>

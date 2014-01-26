@@ -1,0 +1,11 @@
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.w9jds.recorder4glass.MainActivity" >
+
+    <item
+        android:id="@+id/stop_menu_item"
+        android:title="@string/stop_menu"
+        android:icon="@drawable/ic_no_50"/>
+
+</menu>
